@@ -16,7 +16,7 @@ public class Project {
     private String projectName;
     @NotBlank(message = "Project Identifier is required")
     @Column(updatable = false, unique = true)
-    @Size(min = 4, max = 5)
+    @Size(min = 4, max = 8)
     private String projectIdentifier;
     private String description;
 
@@ -27,6 +27,17 @@ public class Project {
     @Column(updatable = false )
     private Date createdAt;
     private Date updatedAt;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "project")
+    private Backlog backlog;
+
+    public Backlog getBacklog() {
+        return backlog;
+    }
+
+    public void setBacklog(Backlog backlog) {
+        this.backlog = backlog;
+    }
 
     public Project() {
 
