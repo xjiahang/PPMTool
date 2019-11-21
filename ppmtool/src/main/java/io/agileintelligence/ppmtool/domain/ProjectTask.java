@@ -1,5 +1,7 @@
 package io.agileintelligence.ppmtool.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
@@ -20,11 +22,18 @@ public class ProjectTask {
     private String status;
     private Integer priority;
 
-    //Many to One with Backlog
 
     private Date dueDate;
     private Date createDate;
     private Date updateDate;
+
+    //Many to One with Backlog
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @JoinColumn(name="backlog_id")
+    @JsonIgnore
+    private Backlog backlog;
+
 
     public ProjectTask(){
 
@@ -108,6 +117,14 @@ public class ProjectTask {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    public Backlog getBacklog() {
+        return backlog;
+    }
+
+    public void setBacklog(Backlog backlog) {
+        this.backlog = backlog;
     }
 
     @Override

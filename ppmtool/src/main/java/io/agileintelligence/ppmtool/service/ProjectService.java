@@ -27,6 +27,7 @@ public class ProjectService {
                 backlog.setProject(project);
 
                 project.setBacklog(backlog);
+                System.out.println(backlog);
             } else {
                 backlog = backlogRepository.findByProjectIdentifier(project.getProjectIdentifier());
                 project.setBacklog(backlog);
