@@ -18,8 +18,8 @@ public class Backlog {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id", nullable = false)
     @JsonIgnore
-
     private Project project;
+
     //One to Many with projectTask
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "backlog")
     private List<ProjectTask> projectTasks = new ArrayList<>();

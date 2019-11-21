@@ -33,4 +33,9 @@ public class BacklogController {
         // what if persistedPT == null
         return new ResponseEntity<ProjectTask>(persistedPT, HttpStatus.CREATED);
     }
+
+    @GetMapping("/{backlog_id}")
+    public Iterable<ProjectTask> getBacklog(@PathVariable String backlog_id) {
+        return projectTaskService.findBacklogById(backlog_id);
+    }
 }

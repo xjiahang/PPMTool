@@ -1,0 +1,75 @@
+diff --git a/ppmtool/src/main/java/io/agileintelligence/ppmtool/domain/Backlog.java b/ppmtool/src/main/java/io/agileintelligence/ppmtool/domain/Backlog.java
+index aac70a7..6e67196 100644
+--- a/ppmtool/src/main/java/io/agileintelligence/ppmtool/domain/Backlog.java
++++ b/ppmtool/src/main/java/io/agileintelligence/ppmtool/domain/Backlog.java
+@@ -18,8 +18,8 @@ public class Backlog {
+     @OneToOne(fetch = FetchType.EAGER)
+     @JoinColumn(name = "project_id", nullable = false)
+     @JsonIgnore
+-
+     private Project project;
++
+     //One to Many with projectTask
+     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "backlog")
+     private List<ProjectTask> projectTasks = new ArrayList<>();
+diff --git a/ppmtool/src/main/java/io/agileintelligence/ppmtool/domain/Project.java b/ppmtool/src/main/java/io/agileintelligence/ppmtool/domain/Project.java
+index d6e1a1f..98211aa 100644
+--- a/ppmtool/src/main/java/io/agileintelligence/ppmtool/domain/Project.java
++++ b/ppmtool/src/main/java/io/agileintelligence/ppmtool/domain/Project.java
+@@ -1,6 +1,7 @@
+ package io.agileintelligence.ppmtool.domain;
+ 
+ import com.fasterxml.jackson.annotation.JsonFormat;
++import com.fasterxml.jackson.annotation.JsonIgnore;
+ 
+ import javax.persistence.*;
+ import javax.validation.constraints.NotBlank;
+@@ -29,6 +30,7 @@ public class Project {
+     private Date updatedAt;
+ 
+     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "project")
++    @JsonIgnore
+     private Backlog backlog;
+ 
+     public Backlog getBacklog() {
+diff --git a/ppmtool/src/main/java/io/agileintelligence/ppmtool/repositories/ProjectTaskRepository.java b/ppmtool/src/main/java/io/agileintelligence/ppmtool/repositories/ProjectTaskRepository.java
+index 2f5d831..925c0b1 100644
+--- a/ppmtool/src/main/java/io/agileintelligence/ppmtool/repositories/ProjectTaskRepository.java
++++ b/ppmtool/src/main/java/io/agileintelligence/ppmtool/repositories/ProjectTaskRepository.java
+@@ -4,6 +4,9 @@ import io.agileintelligence.ppmtool.domain.ProjectTask;
+ import org.springframework.data.repository.CrudRepository;
+ import org.springframework.stereotype.Repository;
+ 
++import java.util.List;
++
+ @Repository
+ public interface ProjectTaskRepository extends CrudRepository<ProjectTask, Long> {
++    List<ProjectTask> findByProjectIdentifierOrderByPriority(String id);
+ }
+diff --git a/ppmtool/src/main/java/io/agileintelligence/ppmtool/service/ProjectTaskService.java b/ppmtool/src/main/java/io/agileintelligence/ppmtool/service/ProjectTaskService.java
+index eb1afd9..7ac632a 100644
+--- a/ppmtool/src/main/java/io/agileintelligence/ppmtool/service/ProjectTaskService.java
++++ b/ppmtool/src/main/java/io/agileintelligence/ppmtool/service/ProjectTaskService.java
+@@ -36,4 +36,8 @@ public class ProjectTaskService {
+ 
+         return projectTaskRepository.save(projectTask);
+     }
++
++    public Iterable<ProjectTask> findBacklogById(String id) {
++        return projectTaskRepository.findByProjectIdentifierOrderByPriority(id);
++    }
+ }
+diff --git a/ppmtool/src/main/java/io/agileintelligence/ppmtool/web/BacklogController.java b/ppmtool/src/main/java/io/agileintelligence/ppmtool/web/BacklogController.java
+index 0828eaf..0b8bab5 100644
+--- a/ppmtool/src/main/java/io/agileintelligence/ppmtool/web/BacklogController.java
++++ b/ppmtool/src/main/java/io/agileintelligence/ppmtool/web/BacklogController.java
+@@ -33,4 +33,9 @@ public class BacklogController {
+         // what if persistedPT == null
+         return new ResponseEntity<ProjectTask>(persistedPT, HttpStatus.CREATED);
+     }
++
++    @GetMapping("/{backlog_id}")
++    public Iterable<ProjectTask> getBacklog(@PathVariable String backlog_id) {
++        return projectTaskService.findBacklogById(backlog_id);
++    }
+ }
