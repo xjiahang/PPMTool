@@ -11,7 +11,7 @@ public class Backlog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer PTSequence = 0;
+    private Integer PTSequence = 0; //project task sequence
     private String projectIdentifier;
 
     //One to One with project
@@ -21,7 +21,7 @@ public class Backlog {
     private Project project;
 
     //One to Many with projectTask
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "backlog")
+    @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, mappedBy = "backlog", orphanRemoval = true)
     private List<ProjectTask> projectTasks = new ArrayList<>();
 
     public Backlog() {

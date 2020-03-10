@@ -10,8 +10,8 @@ import java.util.Date;
 public class ProjectTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(updatable = false)
+    private Long  id;
+    @Column(updatable = false, unique = true)
     private String projectSequence;
     @Column(updatable = false)
     private String projectIdentifier;
@@ -29,7 +29,7 @@ public class ProjectTask {
 
     //Many to One with Backlog
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="backlog_id")
     @JsonIgnore
     private Backlog backlog;

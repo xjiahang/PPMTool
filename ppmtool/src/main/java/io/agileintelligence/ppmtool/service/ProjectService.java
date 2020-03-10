@@ -1,12 +1,15 @@
 package io.agileintelligence.ppmtool.service;
 
 import io.agileintelligence.ppmtool.domain.Backlog;
+import io.agileintelligence.ppmtool.exceptions.ProjectNotFoundException;
 import io.agileintelligence.ppmtool.repositories.BacklogRepository;
 import io.agileintelligence.ppmtool.repositories.ProjectRepository;
 import io.agileintelligence.ppmtool.domain.Project;
 import io.agileintelligence.ppmtool.exceptions.ProjectIdentifierException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.security.Principal;
 
 @Service
 public class ProjectService {
@@ -16,7 +19,7 @@ public class ProjectService {
     @Autowired
     private BacklogRepository backlogRepository;
     //persist object into database
-    public Project saveOrUpdateProject(Project project) {
+    public Project saveOrUpdateProject(Project project, String username) {
         if (project == null)
             return null;
         try {
@@ -38,21 +41,25 @@ public class ProjectService {
         }
     }
 
-    public Project findProjectByIdentifier(String identifier) {
+    public Project findProjectByIdentifier(String identifier, String username) {
         Project project = projectRepository.findByProjectIdentifier(identifier);
         if (project == null) {
             throw new ProjectIdentifierException("Project Id '" + identifier + "' does not exist!");
         }
 
+        if (!project.getProjectLeader().equals(username)) {
+            throw new ProjectNotFoundException("Project "+ identifier + " is not found in your account");
+        }
         return project;
     }
 
-    public Iterable<Project> findAllProjects() {
-        return projectRepository.findAll();
+    public Iterable<Project> findAllProjects(String username) {
+
+        return projectRepository.findAllByProjectLeader(username);
     }
 
-    public void deleteProjectByIdentifier (String identifier) {
-        Project project = findProjectByIdentifier(identifier);
+    public void deleteProjectByIdentifier (String identifier, String username) {
+        Project project = findProjectByIdentifier(identifier, username);
         if (project == null) {
             throw new ProjectIdentifierException("Project Id '" + identifier + "' does not exist!");
         }

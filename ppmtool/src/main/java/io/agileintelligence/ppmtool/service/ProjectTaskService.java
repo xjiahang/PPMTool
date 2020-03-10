@@ -1,6 +1,7 @@
 package io.agileintelligence.ppmtool.service;
 
 import io.agileintelligence.ppmtool.domain.Backlog;
+import io.agileintelligence.ppmtool.domain.Project;
 import io.agileintelligence.ppmtool.domain.ProjectTask;
 import io.agileintelligence.ppmtool.exceptions.ProjectNotFoundException;
 import io.agileintelligence.ppmtool.repositories.BacklogRepository;
@@ -22,6 +23,7 @@ public class ProjectTaskService {
     public ProjectTask addProjectTask(String projectIdentifier, ProjectTask projectTask) {
         if (projectTask == null)
             return null;
+
         if (projectRepository.findByProjectIdentifier(projectIdentifier) == null) {
             throw new ProjectNotFoundException("Project " + projectIdentifier + " not found!");
         }
@@ -48,5 +50,28 @@ public class ProjectTaskService {
             throw new ProjectNotFoundException("Project " + id + " not found!");
         }
         return projectTaskRepository.findByProjectIdentifierOrderByPriority(id);
+    }
+
+    public ProjectTask findProjectTaskByProjectSequence(String backlog_id, String sequence) {
+        Backlog backlog = backlogRepository.findByProjectIdentifier(backlog_id);
+        if (backlog == null) {
+            throw new ProjectNotFoundException("Project " + backlog_id + " not found!");
+        }
+
+        ProjectTask projectTask = projectTaskRepository.findByProjectSequence(sequence);
+        if (projectTask == null) {
+            throw new ProjectNotFoundException("ProjectTask " + sequence + " not found!");
+        }
+
+        if (!projectTask.getProjectIdentifier().equals(backlog_id)) {
+            throw new ProjectNotFoundException("ProjectTask " + sequence + " not exist in Project " + backlog_id + "!");
+        }
+
+        return projectTask;
+    }
+
+    public void deleteProjectTask(String backlog_id, String sequence) {
+        ProjectTask projectTask = findProjectTaskByProjectSequence(backlog_id, sequence);
+        projectTaskRepository.delete(projectTask);
     }
 }

@@ -33,13 +33,13 @@ public class Project {
     @JsonIgnore
     private Backlog backlog;
 
-    public Backlog getBacklog() {
-        return backlog;
-    }
+    //lecture 86
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
 
-    public void setBacklog(Backlog backlog) {
-        this.backlog = backlog;
-    }
+    private  String projectLeader;
+
 
     public Project() {
 
@@ -109,7 +109,28 @@ public class Project {
         this.updatedAt = updatedAt;
     }
 
+    public User getUser() {
+        return user;
+    }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getProjectLeader() {
+        return projectLeader;
+    }
+
+    public void setProjectLeader(String projectLeader) {
+        this.projectLeader = projectLeader;
+    }
+    public Backlog getBacklog() {
+        return backlog;
+    }
+
+    public void setBacklog(Backlog backlog) {
+        this.backlog = backlog;
+    }
     @PrePersist
     protected void onCreate() {
         this.createdAt = new Date();

@@ -1,4 +1,12 @@
 package io.agileintelligence.ppmtool.repositories;
+import io.agileintelligence.ppmtool.domain.User;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public class UserRepository {
+@Repository
+public interface UserRepository extends CrudRepository<User, Long> {
+    User findByUsername(String username);
+    User getById(Long id);
+
+    //why not use findById(Long id)
 }
