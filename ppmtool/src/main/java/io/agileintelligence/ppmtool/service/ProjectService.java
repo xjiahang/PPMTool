@@ -9,6 +9,7 @@ import io.agileintelligence.ppmtool.exceptions.ProjectIdentifierException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.InvalidParameterException;
 import java.security.Principal;
 
 @Service
@@ -21,7 +22,14 @@ public class ProjectService {
     //persist object into database
     public Project saveOrUpdateProject(Project project, String username) {
         if (project == null)
-            return null;
+            throw new InvalidParameterException();
+        //lecture 90
+        if (project.getId() != null) {
+            Project exsit = projectRepository.findByProjectIdentifier(project.getProjectIdentifier());
+            if (exsit == null || !exsit.getProjectLeader().equals(username)) {
+                throw new ProjectNotFoundException("Project not found in your account!");
+            }
+        }
         try {
             Backlog backlog;
             if (project.getId() == null) {
@@ -61,7 +69,8 @@ public class ProjectService {
     public void deleteProjectByIdentifier (String identifier, String username) {
         Project project = findProjectByIdentifier(identifier, username);
         if (project == null) {
-            throw new ProjectIdentifierException("Project Id '" + identifier + "' does not exist!");
+            throw new ProjectIdentifierException("" +
+                    "Project Id '" + identifier + "' does not exist!");
         }
 
         projectRepository.delete(project);
